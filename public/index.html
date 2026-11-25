@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nu-Mp3 | Free Album ZIP Downloads</title>
+
+  <!-- Fuzzy Search Library (Finds closest results even with typos) -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.5.0/dist/fuse.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0e0e12;
+      color: #f4f4f6;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* Header & Search Bar */
+    header {
+      background: linear-gradient(180deg, #181822 0%, #0e0e12 100%);
+      border-bottom: 1px solid #262633;
+      padding: 28px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+
+    .logo span {
+      color: #ff4757;
+    }
+
+    .tagline {
+      color: #a0a0b5;
+      font-size: 0.95rem;
+      margin-top: 4px;
+      margin-bottom: 18px;
+    }
+
+    .search-box {
+      max-width: 560px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 999px;
+      border: 1px solid #323244;
+      background-color: #16161f;
+      color: #ffffff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: #ff4757;
+    }
+
+    /* Main Content */
+    main {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    section {
+      margin-bottom: 48px;
+    }
+
+    .section-title {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      padding-left: 12px;
+      border-left: 4px solid #ff4757;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    /* Album Card (Title -> Artist -> Image -> Date -> Download) */
+    .card {
+      background-color: #171720;
+      border: 1px solid #262634;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #ff4757;
+    }
+
+    .album-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .album-artist {
+      font-size: 0.92rem;
+      color: #b4b4c7;
+      margin-bottom: 12px;
+    }
+
+    .album-cover {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 8px;
+      background-color: #232330;
+      margin-bottom: 12px;
+    }
+
+    .album-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #8888a0;
+      margin-bottom: 12px;
+    }
+
+    .download-btn {
+      display: block;
+      text-align: center;
+      background-color: #ff4757;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: auto;
+      transition: background-color 0.2s;
+    }
+
+    .download-btn:hover {
+      background-color: #ff2e40;
+    }
+
+    .empty-msg {
+      color: #8888a0;
+      font-style: italic;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #6c6c82;
+      font-size: 0.85rem;
+      border-top: 1px solid #1e1e29;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Nu-<span>Mp3</span></div>
+    <p class="tagline">Free Album ZIP Downloads</p>
+    <div class="search-box">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search for an album, artist, or genre..."
+        autocomplete="off"
+      />
+    </div>
+  </header>
+
+  <main>
+    <!-- SEARCH RESULTS (Hidden until user types something) -->
+    <section id="searchSection" class="hidden">
+      <h2 class="section-title">Closest Search Results</h2>
+      <div id="searchGrid" class="grid"></div>
+    </section>
+
+    <!-- HOME PAGE SECTIONS -->
+    <div id="homeSections">
+      <section>
+        <h2 class="section-title">Recommendations</h2>
+        <div id="recommendedGrid" class="grid"></div>
+      </section>
+
+      <section>
+        <h2 class="section-title">New Albums</h2>
+        <div id="newAlbumsGrid" class="grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    &copy; <span id="year"></span> Nu-Mp3
+  </footer>
+
+  <script>
+    // =========================================================================
+    //  ALBUMS LIST — THIS IS WHERE YOU ADD, EDIT, OR REMOVE ALBUMS!
+    // =========================================================================
+    //  HOW TO FILL OUT EACH ALBUM:
+    //  1. title:       "Type the Album Name here"
+    //  2. artist:      "Type the Artist Name here" (shows right below the title)
+    //  3. date:        "YYYY-MM-DD" (Example: "2026-11-24" -> sorts New Albums)
+    //  4. image:       "images/your-picture.jpg" (OR paste an image web link)
+    //  5. downloadUrl: "https://paste-your-free-file-hoster-zip-link-here"
+    //  6. genre:       "Type genre here" (helps search find the album)
+    //  7. recommended: true  (shows in Recommendations) OR false (does not)
+    //
+    //  IMPORTANT: Keep a comma "," between each { ... } album block!
+    // =========================================================================
+
+    const albums = [
+      {
+        title: "Midnight Echoes",                  // <-- 1. TYPE ALBUM NAME HERE
+        artist: "Neon Horizon",                    // <-- 2. TYPE ARTIST HERE
+        date: "2026-11-24",                        // <-- 3. SET DATE (YYYY-MM-DD)
+        image: "images/album1.jpg",                // <-- 4. INSERT IMAGE PATH OR URL HERE
+        downloadUrl: "https://example.com/1.zip",  // <-- 5. PASTE ZIP DOWNLOAD LINK HERE
+        genre: "Synthwave",                        // <-- 6. TYPE GENRE HERE
+        recommended: true                          // <-- 7. true = Recommendations, false = No
+      },
+      {
+        title: "Concrete Static",
+        artist: "The Basement Tapes",
+        date: "2026-11-18",
+        image: "images/album2.jpg",
+        downloadUrl: "https://example.com/2.zip",
+        genre: "Alternative Rock",
+        recommended: true
+      },
+      {
+        title: "Sunday Rain",
+        artist: "Lo-Fi Collective",
+        date: "2026-10-30",
+        image: "https://picsum.photos/400?random=3", // Example using an online image link
+        downloadUrl: "https://example.com/3.zip",
+        genre: "Chillhop",
+        recommended: false
+      }
+
+      // TO ADD ANOTHER ALBUM:
+      // Put a comma after the "}" above, then copy & paste one of the blocks!
+    ];
+
+
+    // =========================================================================
+    //  WEBSITE LOGIC (You do not need to edit anything below this line)
+    // =========================================================================
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Format "2026-11-24" nicely into "Nov 24, 2026"
+    function formatDate(dateStr) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      if (!y || !m || !d) return dateStr;
+      const dateObj = new Date(y, m - 1, d);
+      return dateObj.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    // Build a single album card: Title -> Artist -> Image -> Date -> Download Button
+    function createAlbumCard(album) {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      // 1. Album Title
+      const titleEl = document.createElement("div");
+      titleEl.className = "album-title";
+      titleEl.textContent = album.title;
+
+      // 2. Artist (below album name)
+      const artistEl = document.createElement("div");
+      artistEl.className = "album-artist";
+      artistEl.textContent = album.artist;
+
+      // 3. Album Image (below artist)
+      const imgEl = document.createElement("img");
+      imgEl.className = "album-cover";
+      imgEl.src = album.image;
+      imgEl.alt = `${album.title} by ${album.artist}`;
+      imgEl.loading = "lazy";
+      // Fallback gray box if image file isn't found yet
+      imgEl.onerror = function () {
+        this.onerror = null;
+        this.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">
+            <rect width="100%" height="100%" fill="#232330"/>
+            <text x="50%" y="50%" fill="#787890" font-family="sans-serif" font-size="20" text-anchor="middle" dy=".3em">No Cover Image</text>
+          </svg>`
+        );
+      };
+
+      // 4. Date & Genre row
+      const metaEl = document.createElement("div");
+      metaEl.className = "album-meta";
+
+      const dateSpan = document.createElement("span");
+      dateSpan.textContent = formatDate(album.date);
+
+      const genreSpan = document.createElement("span");
+      genreSpan.textContent = album.genre || "";
+
+      metaEl.appendChild(dateSpan);
+      metaEl.appendChild(genreSpan);
+
+      // 5. Download ZIP Link Button
+      const btnEl = document.createElement("a");
+      btnEl.className = "download-btn";
+      btnEl.href = album.downloadUrl;
+      btnEl.target = "_blank";
+      btnEl.rel = "noopener noreferrer";
+      btnEl.textContent = "Download .ZIP";
+
+      card.appendChild(titleEl);
+      card.appendChild(artistEl);
+      card.appendChild(imgEl);
+      card.appendChild(metaEl);
+      card.appendChild(btnEl);
+
+      return card;
+    }
+
+    function renderList(container, list, emptyText) {
+      container.innerHTML = "";
+      if (list.length === 0) {
+        const msg = document.createElement("p");
+        msg.className = "empty-msg";
+        msg.textContent = emptyText;
+        container.appendChild(msg);
+        return;
+      }
+      list.forEach((album) => container.appendChild(createAlbumCard(album)));
+    }
+
+    // Render Home Page Sections
+    const recommendedAlbums = albums.filter((a) => a.recommended === true);
+    const newestAlbums = [...albums].sort((a, b) => b.date.localeCompare(a.date));
+
+    renderList(
+      document.getElementById("recommendedGrid"),
+      recommendedAlbums,
+      "No recommendations yet."
+    );
+    renderList(
+      document.getElementById("newAlbumsGrid"),
+      newestAlbums,
+      "No albums added yet."
+    );
+
+    // Setup Fuzzy Search (closest results)
+    let fuse = null;
+    if (window.Fuse) {
+      fuse = new Fuse(albums, {
+        keys: [
+          { name: "title", weight: 0.5 },
+          { name: "artist", weight: 0.35 },
+          { name: "genre", weight: 0.15 }
+        ],
+        threshold: 0.45,
+        ignoreLocation: true,
+        useTokenSearch: true
+      });
+    }
+
+    const searchInput = document.getElementById("searchInput");
+    const searchSection = document.getElementById("searchSection");
+    const searchGrid = document.getElementById("searchGrid");
+    const homeSections = document.getElementById("homeSections");
+
+    searchInput.addEventListener("input", (e) => {
+      const query = e.target.value.trim();
+
+      if (!query) {
+        searchSection.classList.add("hidden");
+        homeSections.classList.remove("hidden");
+        return;
+      }
+
+      homeSections.classList.add("hidden");
+      searchSection.classList.remove("hidden");
+
+      let results = [];
+      if (fuse) {
+        results = fuse.search(query).map((r) => r.item);
+      } else {
+        const q = query.toLowerCase();
+        results = albums.filter(
+          (a) =>
+            a.title.toLowerCase().includes(q) ||
+            a.artist.toLowerCase().includes(q) ||
+            (a.genre && a.genre.toLowerCase().includes(q))
+        );
+      }
+
+      renderList(
+        searchGrid,
+        results,
+        `No close matches found for "${query}".`
+      );
+    });
+  </script>
+</body>
+</html>
