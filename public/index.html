@@ -243,6 +243,15 @@
 
     const albums = [
       {
+        title: "F.A.Y.M.",                  // <-- 1. TYPE ALBUM NAME HERE
+        artist: "Flipzyde",                    // <-- 2. TYPE ARTIST HERE
+        date: "2000",                        // <-- 3. SET DATE (YYYY-MM-DD)
+        image: "images/F.A.Y.M.webp",                // <-- 4. INSERT IMAGE PATH OR URL HERE
+        downloadUrl: "https://mega.nz/file/7x5hUQIT#Aw9kWJ6IKPxxBLbFqag91xbu1wVhn52lgPhzNyxZTf0",  // <-- 5. PASTE ZIP DOWNLOAD LINK HERE
+        genre: "Nu-Metal",                        // <-- 6. TYPE GENRE HERE
+        recommended: true                          // <-- 7. true = Recommendations, false = No
+      },
+      {
         title: "Disappear",                  // <-- 1. TYPE ALBUM NAME HERE
         artist: "Into the Core",                    // <-- 2. TYPE ARTIST HERE
         date: "2001",                        // <-- 3. SET DATE (YYYY-MM-DD)
@@ -250,25 +259,7 @@
         downloadUrl: "https://mega.nz/file/D4Q2WD7Z#7ppEPpEA2v2JI2pp4vJyMsunQGMcBX-W62bwEiopZy8",  // <-- 5. PASTE ZIP DOWNLOAD LINK HERE
         genre: "Nu-Metal",                        // <-- 6. TYPE GENRE HERE
         recommended: true                          // <-- 7. true = Recommendations, false = No
-      },
-      {
-        title: "Concrete Static",
-        artist: "The Basement Tapes",
-        date: "2026-11-18",
-        image: "images/album2.jpg",
-        downloadUrl: "https://example.com/2.zip",
-        genre: "Alternative Rock",
-        recommended: true
-      },
-      {
-        title: "Sunday Rain",
-        artist: "Lo-Fi Collective",
-        date: "2026-10-30",
-        image: "https://picsum.photos/400?random=3", // Example using an online image link
-        downloadUrl: "https://example.com/3.zip",
-        genre: "Chillhop",
-        recommended: false
-      },
+      }
       
 
       // TO ADD ANOTHER ALBUM:
@@ -370,7 +361,7 @@
 
     // Render Home Page Sections
     const recommendedAlbums = albums.filter((a) => a.recommended === true);
-    const newestAlbums = [...albums].sort((a, b) => b.date.localeCompare(a.date));
+    const newestAlbums = [...albums];
 
     renderList(
       document.getElementById("recommendedGrid"),
