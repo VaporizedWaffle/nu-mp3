@@ -18,7 +18,7 @@
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: "Courier New", Courier, monospace;
       background-color: #000000;
       color: #ffffff;
       line-height: 1.5;
@@ -66,6 +66,9 @@
       color: #ffffff;
       font-size: 1rem;
       outline: none;
+      font-size: 1rem;
+      outline: none;
+      font-family: inherit;
     }
 
     .search-box input:focus {
@@ -237,6 +240,15 @@
     // =========================================================================
 
     const albums = [
+      {
+        title: "Fear The Little People",                  // <-- 1. TYPE ALBUM NAME HERE
+        artist: "King Mungi",                    // <-- 2. TYPE ARTIST HERE
+        date: "2001",                        // <-- 3. SET DATE (YYYY)
+        image: "https://i.scdn.co/image/ab67616d0000b2734fba37070945dd93c0962bb0",                // <-- 4. INSERT IMAGE PATH OR URL HERE
+        downloadUrl: "https://mega.nz/file/KpgVRZRK#9U0-F5IzlTfV_3Gcn2SiSKNd-ZHieVP2jGJ6XAXM4p0",  // <-- 5. PASTE ZIP DOWNLOAD LINK HERE
+        genre: "Nu-Metal",                        // <-- 6. TYPE GENRE HERE
+        recommended: false
+      },
       {
         title: "Electro.Pop.Metal",                  // <-- 1. TYPE ALBUM NAME HERE
         artist: "Flipzyde",                    // <-- 2. TYPE ARTIST HERE
