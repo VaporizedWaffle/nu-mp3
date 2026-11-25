@@ -192,7 +192,7 @@
       <input
         type="text"
         id="searchInput"
-        placeholder="Search for an album or artist..."
+        placeholder="Search for an album, artist, genre, or year..."
         autocomplete="off"
       />
     </div>
@@ -485,9 +485,10 @@
     if (window.Fuse) {
       fuse = new Fuse(albums, {
         keys: [
-          { name: "title", weight: 0.5 },
-          { name: "artist", weight: 0.35 },
-          { name: "genre", weight: 0.15 }
+          { name: "title", weight: 0.45 },
+          { name: "artist", weight: 0.3 },
+          { name: "genre", weight: 0.15 },
+          { name: "date", weight: 0.1 }
         ],
         threshold: 0.45,
         ignoreLocation: true,
@@ -513,7 +514,10 @@
       searchSection.classList.remove("hidden");
 
       let results = [];
-      if (fuse) {
+      if (/^\d{4}$/.test(query)) {
+        // Exact year search (so "2001" only shows 2001 albums, not 2000)
+        results = albums.filter((a) => a.date && a.date.includes(query));
+      } else if (fuse) {
         results = fuse.search(query).map((r) => r.item);
       } else {
         const q = query.toLowerCase();
@@ -521,6 +525,7 @@
           (a) =>
             a.title.toLowerCase().includes(q) ||
             a.artist.toLowerCase().includes(q) ||
+            (a.date && a.date.includes(q)) ||
             (a.genre && a.genre.toLowerCase().includes(q))
         );
       }
