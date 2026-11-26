@@ -181,6 +181,85 @@
       font-size: 0.85rem;
       border-top: 1px solid #1a1a1a;
     }
+  /* Mega Download Popup Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .modal-box {
+      background-color: #0c0c0c;
+      border: 2px solid #e60000;
+      border-radius: 12px;
+      max-width: 440px;
+      width: 100%;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .modal-album {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ff1a1a;
+      margin-bottom: 10px;
+    }
+
+    .modal-message {
+      font-size: 0.98rem;
+      color: #ffffff;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .modal-btn-proceed,
+    .modal-btn-close {
+      flex: 1;
+      padding: 11px 16px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .modal-btn-proceed {
+      background-color: #cc0000;
+      color: #ffffff;
+      border: 1px solid #cc0000;
+    }
+
+    .modal-btn-proceed:hover {
+      background-color: #ff1a1a;
+      border-color: #ff1a1a;
+    }
+
+    .modal-btn-close {
+      background-color: #1a1a1a;
+      color: #ffffff;
+      border: 1px solid #333333;
+    }
+
+    .modal-btn-close:hover {
+      border-color: #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -222,7 +301,19 @@
   <footer>
     &copy; <span id="year"></span> Nu-Mp3
   </footer>
-
+  <!-- Mega Download Notice Popup -->
+  <div id="megaModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div id="megaAlbumName" class="modal-album"></div>
+      <p class="modal-message">
+        If you are on mobile, click the download button next to "Save to Mega".
+      </p>
+      <div class="modal-buttons">
+        <a id="megaProceedBtn" href="#" target="_blank" rel="noopener noreferrer" class="modal-btn-proceed">Proceed</a>
+        <button type="button" id="megaCloseBtn" class="modal-btn-close">Close</button>
+      </div>
+    </div>
+  </div>
   <script>
     // =========================================================================
     //  ALBUMS LIST — THIS IS WHERE YOU ADD, EDIT, OR REMOVE ALBUMS!
@@ -453,7 +544,39 @@
         year: "numeric"
       });
     }
+    // Mega Download Popup Logic
+    const megaModal = document.getElementById("megaModal");
+    const megaAlbumName = document.getElementById("megaAlbumName");
+    const megaProceedBtn = document.getElementById("megaProceedBtn");
+    const megaCloseBtn = document.getElementById("megaCloseBtn");
 
+    function isMegaLink(url) {
+      return typeof url === "string" && /mega\.(nz|co\.nz)/i.test(url);
+    }
+
+    function openMegaModal(album) {
+      megaAlbumName.textContent = `${album.title} — ${album.artist}`;
+      megaProceedBtn.href = album.downloadUrl;
+      megaModal.classList.remove("hidden");
+    }
+
+    function closeMegaModal() {
+      megaModal.classList.add("hidden");
+      megaProceedBtn.href = "#";
+    }
+
+    megaCloseBtn.addEventListener("click", closeMegaModal);
+    megaProceedBtn.addEventListener("click", () => {
+      setTimeout(closeMegaModal, 100);
+    });
+    megaModal.addEventListener("click", (e) => {
+      if (e.target === megaModal) closeMegaModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !megaModal.classList.contains("hidden")) {
+        closeMegaModal();
+      }
+    });
     // Build a single album card: Title -> Artist -> Image -> Date -> Download Button
     function createAlbumCard(album) {
       const card = document.createElement("div");
@@ -506,7 +629,12 @@
       btnEl.target = "_blank";
       btnEl.rel = "noopener noreferrer";
       btnEl.textContent = "Download .ZIP";
-
+      btnEl.addEventListener("click", (e) => {
+        if (isMegaLink(album.downloadUrl)) {
+          e.preventDefault();
+          openMegaModal(album);
+        }
+      });
       card.appendChild(titleEl);
       card.appendChild(artistEl);
       card.appendChild(imgEl);
