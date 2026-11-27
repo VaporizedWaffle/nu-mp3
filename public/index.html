@@ -77,19 +77,19 @@
 
     /* Main Content */
     main {
-      max-width: 1150px;
+      max-width: 1600px;
       margin: 0 auto;
-      padding: 32px 20px 60px;
+      padding: 28px 20px 60px;
     }
 
     section {
-      margin-bottom: 48px;
+      margin-bottom: 42px;
     }
 
     .section-title {
       font-size: 1.45rem;
       font-weight: 700;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       padding-left: 12px;
       border-left: 4px solid #ff1a1a;
       display: flex;
@@ -99,18 +99,31 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 12px;
     }
 
-    /* Album Card (No movement or expanding on hover) */
+    @media (max-width: 1200px) {
+      .grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    /* Album Card (Compact 10-per-row, no hover expansion) */
     .card {
       background-color: #0c0c0c;
       border: 1px solid #222222;
-      border-radius: 10px;
-      padding: 16px;
+      border-radius: 8px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
+      min-width: 0;
     }
 
     .card:hover {
@@ -118,34 +131,39 @@
     }
 
     .album-title {
-      font-size: 1.1rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: #ffffff;
       margin-bottom: 2px;
+      overflow-wrap: break-word;
     }
 
     .album-artist {
-      font-size: 0.92rem;
+      font-size: 0.75rem;
       color: #b3b3b3;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
+      overflow-wrap: break-word;
     }
 
     .album-cover {
       width: 100%;
       aspect-ratio: 1 / 1;
       object-fit: cover;
-      border-radius: 6px;
+      border-radius: 5px;
       background-color: #141414;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
+      margin-top: auto;
     }
 
     .album-meta {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.8rem;
+      gap: 4px;
+      font-size: 0.68rem;
       color: #808080;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .download-btn {
@@ -155,10 +173,9 @@
       color: #ffffff;
       text-decoration: none;
       font-weight: 700;
-      font-size: 0.92rem;
-      padding: 10px 14px;
-      border-radius: 8px;
-      margin-top: auto;
+      font-size: 0.75rem;
+      padding: 7px 6px;
+      border-radius: 6px;
     }
 
     .download-btn:hover {
@@ -331,6 +348,33 @@
     // =========================================================================
 
     const albums = [
+       {
+        title: "Stepa",
+        artist: "Stepa",
+        date: "2002",
+        image: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02511ea58065eda36ba10dec90",
+        downloadUrl: "https://mega.nz/file/WohWmSbL#CNmU4eeh0CMmX6o2YSeKHtyBDlCTkIzMT-SqHDorz0U",
+        genre: "Nu-Metal",
+        recommended: false
+      },
+      {
+        title: "Neidermeyer's Mind",
+        artist: "Korn",
+        date: "1993",
+        image: "https://themusicshopandmore.com/wp-content/uploads/2020/06/Front-Korn-Neidermeyers-Mind-EXPANDED-EDITION-1993-CD.jpg",
+        downloadUrl: "https://mega.nz/file/28IzACra#fepvOFCMxekKu__XpbAy8MV8Nc0rTkZ97Oc7CJcfpe4",
+        genre: "Nu-Metal",
+        recommended: false
+      },
+      {
+        title: "No Omega",
+        artist: "Cold World",
+        date: "2007",
+        image: "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02b342d0a9346836ad08a57199",
+        downloadUrl: "https://mega.nz/file/6sgCGRLZ#40Loa7a98zO1gitaJYj_FslXcZph6KCUecu_7m15a1w",
+        genre: "Hardcore Punk",
+        recommended: false
+      },
       {
         title: "Korn",
         artist: "Korn",
